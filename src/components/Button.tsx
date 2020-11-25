@@ -1,24 +1,17 @@
 import React, { useState } from "react"
-import { GestureResponderEvent, Text } from "react-native"
+import { GestureResponderEvent, StyleProp, Text, ViewStyle } from "react-native"
 import { ButtonContainer } from "./components"
 import { ButtonText } from "./Typography"
 
 interface ButtonProps {
 	title: string
-	color: string
+	style?: StyleProp<ViewStyle>
 	onPress: ((event: GestureResponderEvent) => void) | undefined
 }
 
-export const Button: React.FC<ButtonProps> = ({ title, color, onPress }) => {
-	// const [isDisabled, setDisabled] = useState(false)
-
-	// const handlePress = () => {
-	// 	setDisabled(true)
-	// 	setTimeout(() => setDisabled(false), 3000)
-	// }
-
+export const Button: React.FC<ButtonProps> = ({ title, onPress, style }) => {
 	return (
-		<ButtonContainer onPress={onPress} style={{ backgroundColor: color }}>
+		<ButtonContainer onPress={onPress} style={style}>
 			<ButtonText>{title}</ButtonText>
 		</ButtonContainer>
 	)

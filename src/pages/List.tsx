@@ -47,7 +47,7 @@ export const List: React.FC<AppNavProps<"List">> = observer(({ navigation, route
 	}
 
 	const ListLoader = store.isLoadingMore ? (
-		<View style={{ minHeight: 230, padding: 20 }}>
+		<View style={{ minHeight: 120, padding: 20 }}>
 			<ActivityIndicator color="#000" size="large" style={{ alignSelf: "center" }} />
 		</View>
 	) : null
@@ -57,11 +57,9 @@ export const List: React.FC<AppNavProps<"List">> = observer(({ navigation, route
 			<FlatList
 				ListFooterComponent={ListLoader}
 				data={store.list}
-				// onRefresh={() =>fetchPokemons(url)}
-				// refreshing={isLoading}
 				showsVerticalScrollIndicator={false}
 				renderItem={(poke) => renderItem(poke)}
-				keyExtractor={(item) => item.name}
+				keyExtractor={(item, index) => item.name + index}
 				onEndReached={() => fetchMorePokemons(store.url)}
 				onEndReachedThreshold={0.1}
 			/>

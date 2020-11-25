@@ -9,11 +9,11 @@ export interface StatBox {
 
 export const StatBox: React.FC<StatBox> = ({ children, type }) => {
 	return (
-		<StatBoxView>
-			<View style={{ alignItems: "center" }}>
+		<StatBoxView style={{ alignItems: "center" }}>
+			<View>
 				<Display>{children}</Display>
 			</View>
-			<View style={{ alignItems: "center" }}>
+			<View>
 				<Label>{type}</Label>
 			</View>
 		</StatBoxView>

@@ -1,24 +1,31 @@
-import Axios from "axios"
-import React, { useCallback, useEffect, useState } from "react"
-import { ActivityIndicator, Share, View } from "react-native"
 import { observer } from "mobx-react"
-import { StatsBoxView, DetailsView, PokeDetailsImage, WrapperDetail } from "../components/components"
-import { PokeDetails, PokeDetailsResponse, pokeStat as PokeStat, PokestatRecord, PokeColorTypes } from "../pokeTypes"
-import { DetailsStoreContext } from "../stores/DetailsStore"
+import React, { useCallback, useEffect } from "react"
+import { ActivityIndicator, Share, View } from "react-native"
 import { AppNavProps } from "../AppParamList"
-import { imageUri } from "../util/PokeApi"
+import { Badge } from "../components/Badge"
+import { Button } from "../components/Button"
+import {
+	BadgesWrapper,
+	DetailsView,
+	Divider,
+	PokeDetailsImage,
+	StatsBoxView,
+	StatsRowView,
+	StatsView,
+} from "../components/components"
 import { StatBox } from "../components/StatBox"
 import { StatRow } from "../components/StatRow"
-import { Button } from "../components/Button"
-import { Badge } from "../components/Badge"
 import { H2 } from "../components/Typography"
+import { PokeColorTypes, PokeDetails, pokeStat as PokeStat, PokestatRecord } from "../pokeTypes"
+import { DetailsStoreContext } from "../stores/DetailsStore"
+import { imageUri } from "../util/PokeApi"
 
 export const Details: React.FC<AppNavProps<"Details">> = observer(({ navigation, route }) => {
-	const { url, name } = route.params
+	const { url } = route.params
 	const store = React.useContext(DetailsStoreContext)
 
-	const makeShareMessage = useCallback((record: PokestatRecord) => {
-		let keys = ""
+	const makeShareMessage = useCallback((record: PokestatRecord, name: string) => {
+		let keys = `${name} stats\n`
 		Object.keys(record).forEach((key) => (keys = keys.concat(`${key}: ${record[key as PokeStat]}\n`)))
 		return keys
 	}, [])
@@ -27,7 +34,7 @@ export const Details: React.FC<AppNavProps<"Details">> = observer(({ navigation,
 		try {
 			const result = await Share.share({
 				title: `${name} stats`,
-				message: makeShareMessage(stats),
+				message: makeShareMessage(stats, name),
 			})
 			if (result.action === Share.sharedAction) {
 				alert("Post Shared")
@@ -45,9 +52,9 @@ export const Details: React.FC<AppNavProps<"Details">> = observer(({ navigation,
 
 	if (store.isLoading) {
 		return (
-			<WrapperDetail>
+			<DetailsView>
 				<ActivityIndicator color="#000" style={{ alignSelf: "center" }} size="large" />
-			</WrapperDetail>
+			</DetailsView>
 		)
 	}
 
@@ -60,46 +67,35 @@ export const Details: React.FC<AppNavProps<"Details">> = observer(({ navigation,
 
 	return (
 		<DetailsView style={{ backgroundColor: pokeTypeColor }}>
-			<View
-				style={{
-					flexDirection: "row",
-					justifyContent: "flex-start",
-					width: "100%",
-					marginLeft: 24,
-				}}
-			>
+			<BadgesWrapper>
 				{store.details.types.map((type) => (
 					<Badge key={type} title={type} />
 				))}
-			</View>
+			</BadgesWrapper>
 
 			<View>
-				<PokeDetailsImage
-					source={{
-						uri: imageUri(store.details.id),
-					}}
-				/>
+				<PokeDetailsImage source={{ uri: imageUri(store.details.id) }} />
 			</View>
-			<StatsBoxView>
-				<View
-					style={{
-						flexDirection: "row",
-						height: "50%",
-						alignItems: "center",
-					}}
-				>
+			<StatsView>
+				<StatsBoxView>
 					<StatBox type="HEIGHT">{store.details.height / 10} m</StatBox>
+					<Divider />
 					<StatBox type="WEIGHT">{store.details.weight / 10} Kg</StatBox>
-				</View>
+				</StatsBoxView>
 
-				<View style={{ top: -20 }}>
-					<H2>Base stats</H2>
+				<H2>Base stats</H2>
+				<StatsRowView>
 					<StatRow type="hp" value={store.details.stats.hp} color={pokeTypeColor} />
 					<StatRow type="attack" value={store.details.stats.attack} color={pokeTypeColor} />
 					<StatRow type="defense" value={store.details.stats.defense} color={pokeTypeColor} />
-				</View>
-				<Button title="Compartilhar" color={pokeTypeColor} onPress={() => onShare(store.details)} />
-			</StatsBoxView>
+				</StatsRowView>
+
+				<Button
+					title="Compartilhar"
+					style={{ backgroundColor: pokeTypeColor, bottom: 32, left: 16, position: "absolute", width: "100%" }}
+					onPress={() => onShare(store.details)}
+				/>
+			</StatsView>
 		</DetailsView>
 	)
 })
